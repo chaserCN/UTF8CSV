@@ -1,0 +1,13 @@
+PODS:
+  - CHCSVParser (2.1.0)
+  - SwiftCSV (0.3.2)
+
+DEPENDENCIES:
+  - CHCSVParser
+  - SwiftCSV
+
+SPEC CHECKSUMS:
+  CHCSVParser: 3bcc7bdb72111a31222e95d57eacceefe4e537e8
+  SwiftCSV: 8b64b738fc54567d229acb17ce6d584e0dd27560
+
+COCOAPODS: 0.39.0
