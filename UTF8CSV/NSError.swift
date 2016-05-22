@@ -11,7 +11,7 @@ import Foundation
 let kCSVErrorDomain = "CSVErrorDomain"
 
 extension NSError {
-    private convenience init(message: String) {
+    internal convenience init(message: String) {
         self.init(domain: kCSVErrorDomain, code: 0, userInfo: [NSLocalizedDescriptionKey: message])
     }
 }

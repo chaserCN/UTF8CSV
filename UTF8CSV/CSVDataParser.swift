@@ -32,7 +32,7 @@ public final class CSVDataParser {
     
     private var state: State = .StartOfValue
     private var keepAppending = 0
-    private var outterError: ErrorType?
+    private var error: ErrorType?
 
     // if we dont clean array every time, parsing 90.000 lines drops from 7 seconds to 3 on iPad2
     private var strings = [String]()
@@ -60,7 +60,7 @@ public final class CSVDataParser {
         }
         
         if state == .Fail {
-            throw outterError ?? NSError.csv.failedToParse
+            throw error ?? NSError.csv.failedToParse
         }
     }
     
@@ -102,7 +102,7 @@ public final class CSVDataParser {
                 do {
                     try processor(strings)
                 } catch (let error) {
-                    outterError = error
+                    self.error = error
                     state = .Fail
                 }
                 
@@ -125,6 +125,7 @@ public final class CSVDataParser {
     
     private func appendValueFromBuffer() {
         guard let s = String(bytesNoCopy: bufferPtr, length: currentBufferOffset, encoding: NSUTF8StringEncoding, freeWhenDone: false) else {
+            error = NSError(message: NSLocalizedString("Failed to create a string while parsing CSV", comment: "UTF8CSV"))
             state = .Fail
             return
         }
