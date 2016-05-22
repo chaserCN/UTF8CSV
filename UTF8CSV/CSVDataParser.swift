@@ -12,7 +12,7 @@ private let quote: UInt8 = 34
 private let semicolon: UInt8 = 59
 private let newline: UInt8 = 10
 
-final class CSVDataParser {
+public final class CSVDataParser {
     private enum ParseResult: Int {
         case AppendByte
         case FinishValue
@@ -41,15 +41,15 @@ final class CSVDataParser {
     private let delimiter: UInt8
 
     private var buffer = [UInt8](count: 1024, repeatedValue: 0)
-    let bufferPtr: UnsafeMutablePointer<UInt8>
+    private let bufferPtr: UnsafeMutablePointer<UInt8>
     private var currentBufferOffset = 0
     
-    init(delimiter: UInt8 = semicolon) {
+    public init(delimiter: UInt8 = semicolon) {
         self.delimiter = delimiter
         bufferPtr = UnsafeMutablePointer<UInt8>(self.buffer)
     }
     
-    func parseData(data: NSData?, processor: [String] throws -> ()) throws {
+    public func parseData(data: NSData?, processor: [String] throws -> ()) throws {
         guard let data = data else {
             try processEOF(processor)
             return

@@ -8,13 +8,13 @@
 
 import Foundation
 
-class CSVFileReader {
+public class CSVFileReader {
     let chunkSize : Int
     
     var fileHandle : NSFileHandle!
     var atEof : Bool = false
     
-    init?(url: NSURL, chunkSize: Int = 102400) {
+    public init?(url: NSURL, chunkSize: Int = 102400) {
         self.chunkSize = chunkSize
         
         if let fileHandle = try? NSFileHandle(forReadingFromURL: url) {
@@ -54,7 +54,7 @@ class CSVFileReader {
 }
 
 extension CSVFileReader : SequenceType {
-    func generate() -> AnyGenerator<NSData> {
+    public func generate() -> AnyGenerator<NSData> {
         return AnyGenerator {
             return self.nextChunk()
         }

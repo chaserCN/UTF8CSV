@@ -8,7 +8,7 @@ UTF8CSV implementation assumes that files are always encoded with UTF8.
 So we can inline UTF8 decoding into the parser instead of using String class.
 The same 1.3MB file UTF8CSV parses 3 seconds on the iPad2.
 
-If you need to convert parsed strings into a structure, you may use CSVDecoder.
+If you need to convert parsed strings into a structure, you may use CSVDecodable protocol.
 
 ## Examples
 
@@ -29,6 +29,9 @@ extension Model: CSVDecodable {
 }
 
 func readModels(url: NSURL) throws -> [Model] {
+    // reader just returns chunks of bytes from the file.
+    // you may use Alamofire.request(.GET, link).stream() 
+    // instead of the reader, for example
     guard let reader = CSVFileReader(url: url) else {
         throw NSError(domain: "", code: 0, userInfo: nil)
     }

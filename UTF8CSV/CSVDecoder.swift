@@ -8,86 +8,86 @@
 
 import Foundation
 
-protocol CSVDecodable {
+public protocol CSVDecodable {
     init(values: [String]) throws
     init(decoder: CSVDecoder) throws
 }
 
 extension CSVDecodable {
-    init(values: [String]) throws {
+    public init(values: [String]) throws {
         let decoder = CSVDecoder(strings: values)
         try self.init(decoder: decoder)
     }
 }
 
-protocol CSVStringRepresentable {
+public protocol CSVStringRepresentable {
     static func fromString(string: String) -> Self?
 }
 
-protocol CSVIntRepresentable {
+public protocol CSVIntRepresentable {
     static func fromInt(i: Int) -> Self?
 }
 
-class CSVDecoder {
+public class CSVDecoder {
     private let strings: [String]
     private var enumerator: EnumerateGenerator<IndexingGenerator<Array<String>>>
     
-    init(strings: [String]) {
+    public init(strings: [String]) {
         self.strings = strings
         self.enumerator = self.strings.enumerate().generate()
     }
 
     // MARK:
 
-    func decodeNext() throws -> Int? {
+    public func decodeNext() throws -> Int? {
         return try decodeNext {Int($0)}
     }
 
-    func decodeNext() throws -> Int {
+    public func decodeNext() throws -> Int {
         return try unwrapOptional(try decodeNext())
     }
 
-    func decodeNext() throws -> Double? {
+    public func decodeNext() throws -> Double? {
         return try decodeNext {Double($0)}
     }
 
-    func decodeNext() throws -> Double {
+    public func decodeNext() throws -> Double {
         return try unwrapOptional(try decodeNext())
     }
     
-    func decodeNext() throws -> Bool? {
+    public func decodeNext() throws -> Bool? {
         return try decodeNext {NSString(string: $0).boolValue}
     }
 
-    func decodeNext() throws -> Bool {
+    public func decodeNext() throws -> Bool {
         return try unwrapOptional(try decodeNext())
     }
 
-    func decodeNext() throws -> String? {
+    public func decodeNext() throws -> String? {
         return try next()
     }
 
-    func decodeNext() throws -> String {
+    public func decodeNext() throws -> String {
         return try next()
     }
 
-    func decodeNext() throws -> NSDecimalNumber? {
+    public func decodeNext() throws -> NSDecimalNumber? {
         return try decodeNext {NSDecimalNumber(string: $0)}
     }
 
-    func decodeNext() throws -> NSDecimalNumber {
+    public func decodeNext() throws -> NSDecimalNumber {
         return try unwrapOptional(try decodeNext())
     }
 
-    func decodeNext<T: CSVStringRepresentable>() throws -> T? {
+    public func decodeNext<T: CSVStringRepresentable>() throws -> T? {
         return try decodeNext {T.fromString($0)}
     }
 
-    func decodeNext<T: CSVStringRepresentable>() throws -> T {
+    public func decodeNext<T: CSVStringRepresentable>() throws -> T {
         return try unwrapOptional(try decodeNext())
     }
 
-    func decodeNext<T: CSVIntRepresentable>() throws -> T? {
+    public func decodeNext<T: CSVIntRepresentable>() throws -> T? {
         return try decodeNext {
             if let i = Int($0) {
                 return T.fromInt(i)
@@ -96,11 +96,11 @@ class CSVDecoder {
         }!
     }
 
-    func decodeNext<T: CSVIntRepresentable>() throws -> T {
+    public func decodeNext<T: CSVIntRepresentable>() throws -> T {
         return try unwrapOptional(try decodeNext())
     }
     
-    func decodeNext(format format: String) throws -> NSDate? {
+    public func decodeNext(format format: String) throws -> NSDate? {
         let formatter = NSDateFormatter()
         formatter.dateFormat = format
         formatter.timeZone = NSTimeZone(forSecondsFromGMT: 0)
@@ -108,7 +108,7 @@ class CSVDecoder {
         return try decodeNext {formatter.dateFromString($0)}
     }
 
-    func decodeNext(format format: String) throws -> NSDate {
+    public func decodeNext(format format: String) throws -> NSDate {
         return try unwrapOptional(try decodeNext(format: format))
     }
 
