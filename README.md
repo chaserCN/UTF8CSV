@@ -30,8 +30,6 @@ extension Model: CSVDecodable {
 
 func readModels(url: NSURL) throws -> [Model] {
     // reader just returns chunks of bytes from the file.
-    // you may use Alamofire.request(.GET, link).stream() 
-    // instead of the reader, for example
     guard let reader = CSVFileReader(url: url) else {
         throw NSError(domain: "", code: 0, userInfo: nil)
     }
