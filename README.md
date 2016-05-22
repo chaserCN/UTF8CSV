@@ -5,7 +5,7 @@ SwiftCSV parses 1.3MB CSV file about 50 seconds on the iPad2, CHCSVParser - 40 s
 If you want to parse a CSV file on the fly while downloading it from the internet, good luck with that.
 
 UTF8CSV implementation assumes that files are always encoded with UTF8. 
-Then UTF8 decoding can be inlined into the parser instead of using String class.
+Then UTF8 decoding can be inlined into the parser instead of relying on the String class.
 UTF8CSV parses the same 1.3MB about 3 seconds on the iPad2.
 
 If you need to convert parsed strings into a structure, you may use CSVDecodable protocol.
