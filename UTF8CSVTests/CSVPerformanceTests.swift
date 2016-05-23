@@ -12,7 +12,7 @@ import CHCSVParser
 @testable import UTF8CSV
 
 class CSVPerformanceTests: XCTestCase {
-    func testCHCSV() {
+    func _testCHCSV() {
         measureBlock {
             let url = fileURL()
             let delimiter = ";".utf16.first!
@@ -20,7 +20,7 @@ class CSVPerformanceTests: XCTestCase {
         }
     }
     
-    func testSwiftCSV() {
+    func _testSwiftCSV() {
         measureBlock {
             let url = fileURL()
             let csv = try! CSV(url: url, delimiter: ";")
@@ -30,7 +30,7 @@ class CSVPerformanceTests: XCTestCase {
         }
     }
     
-    func testUTF8Version() {
+    func _testUTF8Version() {
         measureBlock {
             let url = fileURL()
             
