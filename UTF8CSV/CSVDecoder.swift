@@ -103,8 +103,6 @@ public class CSVDecoder {
     public func decodeNext(format format: String) throws -> NSDate? {
         let formatter = NSDateFormatter()
         formatter.dateFormat = format
-        formatter.timeZone = NSTimeZone(forSecondsFromGMT: 0)
-        
         return try decodeNext {formatter.dateFromString($0)}
     }
 
