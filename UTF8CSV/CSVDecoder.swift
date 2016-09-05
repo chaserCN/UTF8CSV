@@ -72,7 +72,7 @@ public class CSVDecoder {
     }
 
     public func decodeNext() throws -> NSDecimalNumber? {
-        return try decodeNext {NSDecimalNumber(string: $0)}
+        return try decodeNext {$0.toDelocalizedDecimalNumber}
     }
 
     public func decodeNext() throws -> NSDecimalNumber {

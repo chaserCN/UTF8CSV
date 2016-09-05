@@ -17,6 +17,7 @@
 		EB6786771CF0D5E500F1F7F5 /* NSError.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB6786761CF0D5E500F1F7F5 /* NSError.swift */; };
 		EB6786791CF0D8AF00F1F7F5 /* CSVPerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB6786781CF0D8AF00F1F7F5 /* CSVPerformanceTests.swift */; };
 		EB67867C1CF0D99300F1F7F5 /* Test.csv in Resources */ = {isa = PBXBuildFile; fileRef = EB67867B1CF0D99300F1F7F5 /* Test.csv */; };
+		EBE5FFC41D7DDD6400822D8A /* CSVString.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE5FFC31D7DDD6400822D8A /* CSVString.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		EB6786761CF0D5E500F1F7F5 /* NSError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSError.swift; sourceTree = "<group>"; };
 		EB6786781CF0D8AF00F1F7F5 /* CSVPerformanceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVPerformanceTests.swift; sourceTree = "<group>"; };
 		EB67867B1CF0D99300F1F7F5 /* Test.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Test.csv; sourceTree = "<group>"; };
+		EBE5FFC31D7DDD6400822D8A /* CSVString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CSVString.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +107,7 @@
 				EB6786721CF0D5AC00F1F7F5 /* CSVFileReader.swift */,
 				EB6786761CF0D5E500F1F7F5 /* NSError.swift */,
 				EB67865B1CF0D3CC00F1F7F5 /* Info.plist */,
+				EBE5FFC31D7DDD6400822D8A /* CSVString.swift */,
 			);
 			path = UTF8CSV;
 			sourceTree = "<group>";
@@ -280,6 +283,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EBE5FFC41D7DDD6400822D8A /* CSVString.swift in Sources */,
 				EB6786731CF0D5AC00F1F7F5 /* CSVDataParser.swift in Sources */,
 				EB6786751CF0D5AC00F1F7F5 /* CSVFileReader.swift in Sources */,
 				EB6786741CF0D5AC00F1F7F5 /* CSVDecoder.swift in Sources */,
