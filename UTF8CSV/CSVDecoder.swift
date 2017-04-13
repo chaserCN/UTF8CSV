@@ -99,15 +99,23 @@ open class CSVDecoder {
     open func decodeNext<T: CSVIntRepresentable>() throws -> T {
         return try unwrapOptional(try decodeNext())
     }
-    
-    open func decodeNext(format: String) throws -> Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = format
-        return try decodeNext {formatter.date(from: $0)}
-    }
 
     open func decodeNext(format: String) throws -> Date {
         return try unwrapOptional(try decodeNext(format: format))
+    }
+    
+    open func decodeNext(formatter: DateFormatter) throws -> Date {
+        return try unwrapOptional(try decodeNext(formatter: formatter))
+    }
+    
+    open func decodeNext(formatter: DateFormatter) throws -> Date? {
+        return try decodeNext {formatter.date(from: $0)}
+    }
+
+    open func decodeNext(format: String) throws -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return try decodeNext(formatter: formatter)
     }
 
     // MARK:
