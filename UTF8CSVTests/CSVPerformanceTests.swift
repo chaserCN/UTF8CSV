@@ -13,15 +13,17 @@ import CHCSVParser
 
 class CSVPerformanceTests: XCTestCase {
     func _testCHCSV() {
-        measureBlock {
+        measure {
             let url = fileURL()
             let delimiter = ";".utf16.first!
-            let _ = NSArray(contentsOfDelimitedURL: url, delimiter: delimiter)
+            let parser = CHCSVParser(contentsOfDelimitedURL: url, delimiter: delimiter)
+            parser?.parse()
+            //let array: NSArray = NSArray.arrayWithContentsOfDelimitedURL(url, delimiter: delimiter)
         }
     }
     
     func _testSwiftCSV() {
-        measureBlock {
+        measure {
             let url = fileURL()
             let csv = try! CSV(url: url, delimiter: ";")
             
@@ -31,27 +33,27 @@ class CSVPerformanceTests: XCTestCase {
     }
     
     func _testUTF8Version() {
-        measureBlock {
+        measure {
             let url = fileURL()
             
             let reader = CSVFileReader(url: url)!
             let parser = CSVDataParser()
             
-            let processor: [String] -> () = {_ in
+            let processor: ([String]) -> () = {_ in
             }
             
             for data in reader {
-                try! parser.parseData(data, processor: processor)
+                try! parser.parse(data, using: processor)
             }
             
-            try! parser.parseData(nil, processor: processor)
+            try! parser.parse(nil, using: processor)
         }
     }
 }
 
-private func fileURL() -> NSURL {
-    let bundle = NSBundle(forClass: CSVPerformanceTests.self)
-    let path = bundle.pathForResource("Test", ofType: "csv")!
-    return NSURL(fileURLWithPath: path)
+private func fileURL() -> URL {
+    let bundle = Bundle(for: CSVPerformanceTests.self)
+    let path = bundle.path(forResource: "Test", ofType: "csv")!
+    return URL(fileURLWithPath: path)
 }
 

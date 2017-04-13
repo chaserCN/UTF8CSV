@@ -10,8 +10,8 @@ import Foundation
 
 extension String {
     var toDelocalizedDecimalNumber: NSDecimalNumber? {
-        let number = NSDecimalNumber(string: self.stringByReplacingOccurrencesOfString(",", withString: "."),
-                                     locale: NSLocale.systemLocale())
-        return number == NSDecimalNumber.notANumber() ? nil : number
+        let number = NSDecimalNumber(string: self.replacingOccurrences(of: ",", with: "."),
+                                     locale: nil)
+        return number == NSDecimalNumber.notANumber ? nil : number
     }
 }

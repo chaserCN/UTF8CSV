@@ -10,8 +10,8 @@ import XCTest
 @testable import UTF8CSV
 
 private extension String {
-    func toData() -> NSData {
-        return self.dataUsingEncoding(NSUTF8StringEncoding)!
+    func toData() -> Data {
+        return self.data(using: String.Encoding.utf8)!
     }
 }
 
@@ -74,36 +74,40 @@ class CSVParserTests: XCTestCase {
     }
 }
 
+func ==<Element : Equatable> (lhs: [[Element]], rhs: [[Element]]) -> Bool {
+    return lhs.elementsEqual(rhs, by: ==)
+}
+
 extension CSVParserTests {
-    func parseText(text: String) -> [[String]] {
+    func parseText(_ text: String) -> [[String]] {
         var result: [[String]] = []
         
-        _ = try? parser.parseData(text.toData()) {
+        _ = try? parser.parse(text.toData()) {
             result.append($0)
         }
         
-        _ = try? parser.parseData(nil) {
+        _ = try? parser.parse(nil) {
             result.append($0)
         }
         
         return result
     }
     
-    func chopAndParseText(text: String, step: Int) -> [[String]] {
+    func chopAndParseText(_ text: String, step: Int) -> [[String]] {
         let data = text.toData()
-        let bytes = UnsafePointer<UInt8>(data.bytes)
+        let bytes = (data as NSData).bytes.bindMemory(to: UInt8.self, capacity: data.count)
         var result = [[String]]()
         
         var i = 0
-        while i < data.length {
-            let d = NSData(bytes: bytes+i, length: min(step, data.length-i))
-            _ = try? parser.parseData(d) {
+        while i < data.count {
+            let d = Data(bytes: UnsafePointer<UInt8>(bytes+i), count: min(step, data.count-i))
+            _ = try? parser.parse(d) {
                 result.append($0)
             }
             i += step
         }
         
-        _ = try? parser.parseData(nil) {
+        _ = try? parser.parse(nil) {
             result.append($0)
         }
         
