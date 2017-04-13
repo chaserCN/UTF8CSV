@@ -21,73 +21,73 @@ extension CSVDecodable {
 }
 
 public protocol CSVStringRepresentable {
-    static func fromString(_ string: String) -> Self?
+    static func fromString(string: String) -> Self?
 }
 
 public protocol CSVIntRepresentable {
-    static func fromInt(_ i: Int) -> Self?
+    static func fromInt(i: Int) -> Self?
 }
 
-open class CSVDecoder {
-    fileprivate let strings: [String]
-    fileprivate var enumerator: EnumeratedIterator<IndexingIterator<Array<String>>>
+public class CSVDecoder {
+    private let strings: [String]
+    private var enumerator: EnumerateGenerator<IndexingGenerator<Array<String>>>
     
     public init(strings: [String]) {
         self.strings = strings
-        self.enumerator = self.strings.enumerated().makeIterator()
+        self.enumerator = self.strings.enumerate().generate()
     }
 
     // MARK:
 
-    open func decodeNext() throws -> Int? {
+    public func decodeNext() throws -> Int? {
         return try decodeNext {Int($0)}
     }
 
-    open func decodeNext() throws -> Int {
+    public func decodeNext() throws -> Int {
         return try unwrapOptional(try decodeNext())
     }
 
-    open func decodeNext() throws -> Double? {
+    public func decodeNext() throws -> Double? {
         return try decodeNext {Double($0)}
     }
 
-    open func decodeNext() throws -> Double {
+    public func decodeNext() throws -> Double {
         return try unwrapOptional(try decodeNext())
     }
     
-    open func decodeNext() throws -> Bool? {
+    public func decodeNext() throws -> Bool? {
         return try decodeNext {NSString(string: $0).boolValue}
     }
 
-    open func decodeNext() throws -> Bool {
+    public func decodeNext() throws -> Bool {
         return try unwrapOptional(try decodeNext())
     }
 
-    open func decodeNext() throws -> String? {
+    public func decodeNext() throws -> String? {
         return try next()
     }
 
-    open func decodeNext() throws -> String {
+    public func decodeNext() throws -> String {
         return try next()
     }
 
-    open func decodeNext() throws -> NSDecimalNumber? {
+    public func decodeNext() throws -> NSDecimalNumber? {
         return try decodeNext {$0.toDelocalizedDecimalNumber}
     }
 
-    open func decodeNext() throws -> NSDecimalNumber {
+    public func decodeNext() throws -> NSDecimalNumber {
         return try unwrapOptional(try decodeNext())
     }
 
-    open func decodeNext<T: CSVStringRepresentable>() throws -> T? {
+    public func decodeNext<T: CSVStringRepresentable>() throws -> T? {
         return try decodeNext {T.fromString($0)}
     }
 
-    open func decodeNext<T: CSVStringRepresentable>() throws -> T {
+    public func decodeNext<T: CSVStringRepresentable>() throws -> T {
         return try unwrapOptional(try decodeNext())
     }
 
-    open func decodeNext<T: CSVIntRepresentable>() throws -> T? {
+    public func decodeNext<T: CSVIntRepresentable>() throws -> T? {
         return try decodeNext {
             if let i = Int($0) {
                 return T.fromInt(i)
@@ -96,23 +96,23 @@ open class CSVDecoder {
         }!
     }
 
-    open func decodeNext<T: CSVIntRepresentable>() throws -> T {
+    public func decodeNext<T: CSVIntRepresentable>() throws -> T {
         return try unwrapOptional(try decodeNext())
     }
     
-    open func decodeNext(format: String) throws -> Date? {
-        let formatter = DateFormatter()
+    public func decodeNext(format format: String) throws -> NSDate? {
+        let formatter = NSDateFormatter()
         formatter.dateFormat = format
-        return try decodeNext {formatter.date(from: $0)}
+        return try decodeNext {formatter.dateFromString($0)}
     }
 
-    open func decodeNext(format: String) throws -> Date {
+    public func decodeNext(format format: String) throws -> NSDate {
         return try unwrapOptional(try decodeNext(format: format))
     }
 
     // MARK:
     
-    fileprivate func decodeNext<T>(_ converter: (String) -> T?) throws -> T? {
+    private func decodeNext<T>(converter: String -> T?) throws -> T? {
         let string = try next()
         
         if string.isEmpty {
@@ -126,14 +126,14 @@ open class CSVDecoder {
         return t
     }
     
-    fileprivate func next() throws -> String {
+    private func next() throws -> String {
         guard let s = enumerator.next() else {
             throw NSError.csv.failedToDecode(strings)
         }
         return s.element
     }
 
-    fileprivate func unwrapOptional<T>(_ t: T?) throws -> T {
+    private func unwrapOptional<T>(t: T?) throws -> T {
         guard let t = t else {
             throw NSError.csv.failedToDecode(strings)
         }

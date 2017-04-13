@@ -22,7 +22,7 @@ extension NSError {
             return NSError(message: NSLocalizedString("Failed to parse CSV file", comment: ""))
         }
         
-        static func failedToDecode(_ strings: [String]) -> NSError {
+        static func failedToDecode(strings: [String]) -> NSError {
             return NSError(message: NSLocalizedString("Failed to decode CSV values: \(strings)", comment: ""))
         }
     }

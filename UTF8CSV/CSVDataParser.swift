@@ -13,118 +13,120 @@ private let semicolon: UInt8 = 59
 private let newline: UInt8 = 10
 
 public final class CSVDataParser {
-    fileprivate enum ParseResult: Int {
-        case appendByte
-        case finishValue
-        case finishLine
-        case skip
-        case fail
+    private enum ParseResult: Int {
+        case AppendByte
+        case FinishValue
+        case FinishLine
+        case Skip
+        case Fail
     }
     
-    fileprivate enum State: Int {
-        case startOfValue
-        case parsing
-        case innerQuotesWhileParsing
-        case parsingQuotes
-        case innerQuotesWhileParsingQuotes
-        case fail
+    private enum State: Int {
+        case StartOfValue
+        case Parsing
+        case InnerQuotesWhileParsing
+        case ParsingQuotes
+        case InnerQuotesWhileParsingQuotes
+        case Fail
     }
     
-    fileprivate var state: State = .startOfValue
-    fileprivate var keepAppending = 0
-    fileprivate var error: Error?
+    private var state: State = .StartOfValue
+    private var keepAppending = 0
+    private var error: ErrorType?
 
     // if we dont clean array every time, parsing 90.000 lines drops from 7 seconds to 3 on iPad2
-    fileprivate var strings = [String]()
-    fileprivate var currentStringOffset = 0
+    private var strings = [String]()
+    private var currentStringOffset = 0
     
-    fileprivate let delimiter: UInt8
+    private let delimiter: UInt8
 
-    fileprivate var buffer = [UInt8](repeating: 0, count: 1024)
-    fileprivate let bufferPtr: UnsafeMutablePointer<UInt8>
-    fileprivate var currentBufferOffset = 0
+    private var buffer = [UInt8](count: 1024, repeatedValue: 0)
+    private let bufferPtr: UnsafeMutablePointer<UInt8>
+    private var currentBufferOffset = 0
     
     public init(delimiter: UInt8 = semicolon) {
         self.delimiter = delimiter
-        bufferPtr = UnsafeMutablePointer<UInt8>(mutating: self.buffer)
+        bufferPtr = UnsafeMutablePointer<UInt8>(self.buffer)
     }
     
-    public func parse(_ data: Data?, using processLineString: @escaping ([String]) throws -> ()) throws {
+    public func parseData(data: NSData?, processor: [String] throws -> ()) throws {
         guard let data = data else {
-            try processEOF(using: processLineString)
+            try processEOF(processor)
             return
         }
         
-        data.enumerateBytes {pointer, range, _ in
-            self.parseData(at: pointer, using: processLineString)
+        data.enumerateByteRangesUsingBlock {pointer, range, _ in
+            self.parseDataChunk(pointer, length: range.length, processor: processor)
         }
         
-        if state == .fail {
+        if state == .Fail {
             throw error ?? NSError.csv.failedToParse
         }
     }
     
-    fileprivate func parseData(at bufferPointer: UnsafeBufferPointer<UInt8>, using processLineString: ([String]) throws -> ()) {
+    private func parseDataChunk(dataPointer: UnsafePointer<Void>, length: Int, processor: [String] throws -> ()) {
+        let bufferPointer = UnsafeBufferPointer<UInt8>(start: UnsafePointer<UInt8>(dataPointer), count: length)
+        
         var index = -1
         
         for byte in bufferPointer {
             index += 1
 
             if self.keepAppending > 0 {
-                append(byte)
+                appendByte(byte)
                 self.keepAppending -= 1
                 continue
             }
             
-            let times = self.timesToIgnoreProcessing(forUTF8StartingWith: byte)
+            let times = self.timesToIgnoreProcessingForUTF8(byte)
             if times > 0 {
-                append(byte)
+                appendByte(byte)
                 self.keepAppending = times
                 continue
             }
             
-            switch self.process(byte) {
-            case .appendByte:
-                append(byte)
+            switch self.processByte(byte) {
+            case .AppendByte:
+                appendByte(byte)
             
-            case.skip:
+            case.Skip:
                 break
                 
-            case .finishValue:
+            case .FinishValue:
                 appendValueFromBuffer()
             
-            case .finishLine:
+            case .FinishLine:
                 appendValueFromBuffer()
                 finishLine()
 
                 do {
-                    try processLineString(strings)
+                    try processor(strings)
                 } catch (let error) {
                     self.error = error
-                    state = .fail
+                    state = .Fail
                 }
                 
-            case .fail:
+            case .Fail:
                 finishLine()
                 break
             }
         }
     }
     
-    fileprivate func append(_ byte: UInt8) {
+    private func appendByte(byte: UInt8) {
         if currentBufferOffset >= buffer.count {
-            let extraSpace = [UInt8](repeating: 0, count: 1024)
-            buffer.append(contentsOf: extraSpace)
+            let extraSpace = [UInt8](count: 1024, repeatedValue: 0)
+            buffer.appendContentsOf(extraSpace)
         }
         
         bufferPtr[currentBufferOffset] = byte
         currentBufferOffset += 1
     }
     
-    fileprivate func appendValueFromBuffer() {
-        guard let s = String(bytesNoCopy: bufferPtr, length: currentBufferOffset, encoding: String.Encoding.utf8, freeWhenDone: false) else {
+    private func appendValueFromBuffer() {
+        guard let s = String(bytesNoCopy: bufferPtr, length: currentBufferOffset, encoding: NSUTF8StringEncoding, freeWhenDone: false) else {
             error = NSError(message: NSLocalizedString("Failed to create a string while parsing CSV", comment: "UTF8CSV"))
-            state = .fail
+            state = .Fail
             return
         }
         
@@ -138,7 +140,7 @@ public final class CSVDataParser {
         currentBufferOffset = 0
     }
     
-    fileprivate func finishLine() {
+    private func finishLine() {
         if currentStringOffset != strings.count {
             strings.removeLast(strings.count - currentStringOffset)
         }
@@ -147,7 +149,7 @@ public final class CSVDataParser {
         currentStringOffset = 0
     }
     
-    fileprivate func processEOF(using processor: ([String]) throws -> ()) throws {
+    private func processEOF(processor: [String] throws -> ()) throws {
         if currentBufferOffset <= 0 {
             return
         }
@@ -160,7 +162,7 @@ public final class CSVDataParser {
 }
     
 extension CSVDataParser {
-    fileprivate func timesToIgnoreProcessing(forUTF8StartingWith byte: UInt8) -> Int {
+    private func timesToIgnoreProcessingForUTF8(byte: UInt8) -> Int {
         if byte & 0b1000_0000 == 0 {
             return 0
         }
@@ -178,83 +180,83 @@ extension CSVDataParser {
 }
 
 extension CSVDataParser {
-    fileprivate func process(_ byte: UInt8) -> ParseResult {
-        if state == .startOfValue {
+    private func processByte(byte: UInt8) -> ParseResult {
+        if state == .StartOfValue {
             if byte == quote {
-                state = .parsingQuotes
-                return .skip
+                state = .ParsingQuotes
+                return .Skip
             }
 
             if byte == delimiter {
-                return .finishValue
+                return .FinishValue
             }
             
             if byte == newline {
-                return .finishLine
+                return .FinishLine
             }
             
-            state = .parsing
-            return .appendByte
+            state = .Parsing
+            return .AppendByte
         }
         
-        if state == .parsing {
+        if state == .Parsing {
             if byte == quote {
-                state = .innerQuotesWhileParsing
-                return .skip
+                state = .InnerQuotesWhileParsing
+                return .Skip
             }
             
             if byte == delimiter {
-                state = .startOfValue
-                return .finishValue
+                state = .StartOfValue
+                return .FinishValue
             }
             
             if byte == newline {
-                state = .startOfValue
-                return .finishLine
+                state = .StartOfValue
+                return .FinishLine
             }
             
-            return .appendByte
+            return .AppendByte
         }
 
-        if state == .innerQuotesWhileParsing {
+        if state == .InnerQuotesWhileParsing {
             if byte == quote {
-                state = .parsing
-                return .appendByte
+                state = .Parsing
+                return .AppendByte
             }
 
-            state = .fail
-            return .fail
+            state = .Fail
+            return .Fail
         }
 
-        if state == .parsingQuotes {
+        if state == .ParsingQuotes {
             if byte == quote {
-                state = .innerQuotesWhileParsingQuotes
-                return .skip
+                state = .InnerQuotesWhileParsingQuotes
+                return .Skip
             }
             
-            return .appendByte
+            return .AppendByte
         }
         
-        if state == .innerQuotesWhileParsingQuotes {
+        if state == .InnerQuotesWhileParsingQuotes {
             if byte == quote {
-                state = .parsingQuotes
-                return .appendByte
+                state = .ParsingQuotes
+                return .AppendByte
             }
             
             if byte == delimiter {
-                state = .startOfValue
-                return .finishValue
+                state = .StartOfValue
+                return .FinishValue
             }
             
             if byte == newline {
-                state = .startOfValue
-                return .finishLine
+                state = .StartOfValue
+                return .FinishLine
             }
             
-            state = .fail
-            return .fail
+            state = .Fail
+            return .Fail
         }
         
-        return .fail
+        return .Fail
     }
 }

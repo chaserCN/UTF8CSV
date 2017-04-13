@@ -1,25 +1,13 @@
 PODS:
   - CHCSVParser (2.1.0)
-  - SwiftCSV (0.4.0)
+  - SwiftCSV (0.3.2)
 
 DEPENDENCIES:
   - CHCSVParser
-  - SwiftCSV (from `https://github.com/naoty/SwiftCSV`, branch `develop`)
-
-EXTERNAL SOURCES:
-  SwiftCSV:
-    :branch: develop
-    :git: https://github.com/naoty/SwiftCSV
-
-CHECKOUT OPTIONS:
-  SwiftCSV:
-    :commit: 30f45b5e1d0f067b8964eafa201796a6b3545e8b
-    :git: https://github.com/naoty/SwiftCSV
+  - SwiftCSV
 
 SPEC CHECKSUMS:
   CHCSVParser: 3bcc7bdb72111a31222e95d57eacceefe4e537e8
-  SwiftCSV: 6ed5c41ada755a3bfc9e245207bd362c23cb3ca6
+  SwiftCSV: 8b64b738fc54567d229acb17ce6d584e0dd27560
 
-PODFILE CHECKSUM: 842a58240632714dd4def9043047a17ba7f4dca3
-
-COCOAPODS: 1.1.1
+COCOAPODS: 0.39.0

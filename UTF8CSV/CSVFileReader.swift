@@ -8,16 +8,16 @@
 
 import Foundation
 
-open class CSVFileReader {
+public class CSVFileReader {
     let chunkSize : Int
     
-    var fileHandle : FileHandle!
+    var fileHandle : NSFileHandle!
     var atEof : Bool = false
     
-    public init?(url: URL, chunkSize: Int = 102400) {
+    public init?(url: NSURL, chunkSize: Int = 102400) {
         self.chunkSize = chunkSize
         
-        if let fileHandle = try? FileHandle(forReadingFrom: url) {
+        if let fileHandle = try? NSFileHandle(forReadingFromURL: url) {
             self.fileHandle = fileHandle
         } else {
             self.fileHandle = nil
@@ -30,15 +30,15 @@ open class CSVFileReader {
     }
     
     /// Return next line, or nil on EOF.
-    func nextChunk() -> Data? {
+    func nextChunk() -> NSData? {
         precondition(fileHandle != nil, "Attempt to read from closed file")
         
         if atEof {
             return nil
         }
         
-        let tmpData = fileHandle.readData(ofLength: chunkSize)
-        if tmpData.count == 0 {
+        let tmpData = fileHandle.readDataOfLength(chunkSize)
+        if tmpData.length == 0 {
             atEof = true
             return nil
         }
@@ -53,9 +53,9 @@ open class CSVFileReader {
     }
 }
 
-extension CSVFileReader : Sequence {
-    public func makeIterator() -> AnyIterator<Data> {
-        return AnyIterator {
+extension CSVFileReader : SequenceType {
+    public func generate() -> AnyGenerator<NSData> {
+        return AnyGenerator {
             return self.nextChunk()
         }
     }
