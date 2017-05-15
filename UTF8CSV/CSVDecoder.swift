@@ -9,14 +9,30 @@
 import Foundation
 
 public protocol CSVDecodable {
-    init(values: [String]) throws
+    init(values: [String], serverTimeZone: TimeZone) throws
+    init(decoder: CSVDecoder, serverTimeZone: TimeZone) throws
     init(decoder: CSVDecoder) throws
 }
 
 extension CSVDecodable {
-    public init(values: [String]) throws {
+    public init(values: [String], serverTimeZone: TimeZone) throws {
         let decoder = CSVDecoder(strings: values)
+        try self.init(decoder: decoder, serverTimeZone: serverTimeZone)
+    }
+
+    public init(decoder: CSVDecoder, serverTimeZone: TimeZone) throws {
         try self.init(decoder: decoder)
+    }
+}
+
+public protocol CSVDecodableZone: CSVDecodable {}
+
+extension CSVDecodableZone {
+    //CSVDecodableZone has to implement init(values: [String], serverTimeZone: TimeZone)
+    //otherwise this will create a loop between inits.
+    //this is a work around. need to figure out a better way latter
+    public init(decoder: CSVDecoder) throws {
+        try self.init(decoder: decoder, serverTimeZone: TimeZone.current)
     }
 }
 
