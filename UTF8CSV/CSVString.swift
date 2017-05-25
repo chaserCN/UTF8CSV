@@ -15,3 +15,20 @@ extension String {
         return number == NSDecimalNumber.notANumber ? nil : number
     }
 }
+
+// utf8ToString is from Apple's protobuffer parser.
+// it's even slightly faster than String(bytesNoCopy:length:encoding:freeWhenDone:)
+// see StringUtils.swift in https://github.com/apple/swift-protobuf
+
+internal func utf8ToString(bytes: UnsafePointer<UInt8>, count: Int) -> String? {
+    if count == 0 {
+        return String()
+    }
+
+    let s = NSString(bytes: bytes, length: count, encoding: String.Encoding.utf8.rawValue)
+    if let s = s {
+        return String._unconditionallyBridgeFromObjectiveC(s)
+    }
+
+    return nil
+}

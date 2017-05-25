@@ -122,7 +122,7 @@ public final class CSVDataParser {
     }
     
     fileprivate func appendValueFromBuffer() {
-        guard let s = String(bytesNoCopy: bufferPtr, length: currentBufferOffset, encoding: String.Encoding.utf8, freeWhenDone: false) else {
+        guard let s = utf8ToString(bytes: bufferPtr, count: currentBufferOffset) else {
             error = NSError(message: NSLocalizedString("Failed to create a string while parsing CSV", comment: "UTF8CSV"))
             state = .fail
             return
