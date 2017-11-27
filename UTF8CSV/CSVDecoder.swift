@@ -55,6 +55,22 @@ open class CSVDecoder {
 
     // MARK:
 
+    open func decodeNext() throws -> Int64? {
+        return try decodeNext {Int64($0)}
+    }
+    
+    open func decodeNext() throws -> Int64 {
+        return try unwrapOptional(try decodeNext())
+    }
+    
+    open func decodeNext() throws -> Int32? {
+        return try decodeNext {Int32($0)}
+    }
+    
+    open func decodeNext() throws -> Int32 {
+        return try unwrapOptional(try decodeNext())
+    }
+
     open func decodeNext() throws -> Int? {
         return try decodeNext {Int($0)}
     }
