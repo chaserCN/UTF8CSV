@@ -9,11 +9,11 @@
 import Foundation
 
 private let quote: UInt8 = 34
-private let semicolon: UInt8 = 59
+public let semicolon: UInt8 = 59
 private let newline: UInt8 = 10
 
 public final class CSVDataParser {
-    fileprivate enum ParseResult: Int {
+    private enum ParseResult: Int {
         case appendByte
         case finishValue
         case finishLine
@@ -21,7 +21,7 @@ public final class CSVDataParser {
         case fail
     }
     
-    fileprivate enum State: Int {
+    private enum State: Int {
         case startOfValue
         case parsing
         case innerQuotesWhileParsing
@@ -30,19 +30,19 @@ public final class CSVDataParser {
         case fail
     }
     
-    fileprivate var state: State = .startOfValue
-    fileprivate var keepAppending = 0
-    fileprivate var error: Error?
+    private var state: State = .startOfValue
+    private var keepAppending = 0
+    private var error: Error?
 
     // if we dont clean array every time, parsing 90.000 lines drops from 7 seconds to 3 on iPad2
-    fileprivate var strings = [String]()
-    fileprivate var currentStringOffset = 0
+    private var strings = [String]()
+    private var currentStringOffset = 0
     
-    fileprivate let delimiter: UInt8
+    private let delimiter: UInt8
 
-    fileprivate var buffer = [UInt8](repeating: 0, count: 1024)
-    fileprivate let bufferPtr: UnsafeMutablePointer<UInt8>
-    fileprivate var currentBufferOffset = 0
+    private var buffer = [UInt8](repeating: 0, count: 1024)
+    private let bufferPtr: UnsafeMutablePointer<UInt8>
+    private var currentBufferOffset = 0
     
     public init(delimiter: UInt8 = semicolon) {
         self.delimiter = delimiter
@@ -64,7 +64,7 @@ public final class CSVDataParser {
         }
     }
     
-    fileprivate func parseData(at bufferPointer: UnsafeBufferPointer<UInt8>, using processLineString: ([String]) throws -> ()) {
+    private func parseData(at bufferPointer: UnsafeBufferPointer<UInt8>, using processLineString: ([String]) throws -> ()) {
         var index = -1
         
         for byte in bufferPointer {
@@ -111,7 +111,7 @@ public final class CSVDataParser {
         }
     }
     
-    fileprivate func append(_ byte: UInt8) {
+    private func append(_ byte: UInt8) {
         if currentBufferOffset >= buffer.count {
             let extraSpace = [UInt8](repeating: 0, count: 1024)
             buffer.append(contentsOf: extraSpace)
@@ -121,7 +121,7 @@ public final class CSVDataParser {
         currentBufferOffset += 1
     }
     
-    fileprivate func appendValueFromBuffer() {
+    private func appendValueFromBuffer() {
         guard let s = utf8ToString(bytes: bufferPtr, count: currentBufferOffset) else {
             error = NSError(message: NSLocalizedString("Failed to create a string while parsing CSV", comment: "UTF8CSV"))
             state = .fail
@@ -138,7 +138,7 @@ public final class CSVDataParser {
         currentBufferOffset = 0
     }
     
-    fileprivate func finishLine() {
+    private func finishLine() {
         if currentStringOffset != strings.count {
             strings.removeLast(strings.count - currentStringOffset)
         }
@@ -147,7 +147,7 @@ public final class CSVDataParser {
         currentStringOffset = 0
     }
     
-    fileprivate func processEOF(using processor: ([String]) throws -> ()) throws {
+    private func processEOF(using processor: ([String]) throws -> ()) throws {
         if currentBufferOffset <= 0 {
             return
         }
@@ -160,7 +160,7 @@ public final class CSVDataParser {
 }
     
 extension CSVDataParser {
-    fileprivate func timesToIgnoreProcessing(forUTF8StartingWith byte: UInt8) -> Int {
+    private func timesToIgnoreProcessing(forUTF8StartingWith byte: UInt8) -> Int {
         if byte & 0b1000_0000 == 0 {
             return 0
         }
@@ -178,7 +178,7 @@ extension CSVDataParser {
 }
 
 extension CSVDataParser {
-    fileprivate func process(_ byte: UInt8) -> ParseResult {
+    private func process(_ byte: UInt8) -> ParseResult {
         if state == .startOfValue {
             if byte == quote {
                 state = .parsingQuotes
