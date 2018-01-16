@@ -151,8 +151,9 @@ open class CSVDecoder {
     }
 
     // MARK:
-    
-    fileprivate func decodeNext<T>(_ converter: (String) -> T?) throws -> T? {
+    // open for custom extensions
+
+    open func decodeNext<T>(_ converter: (String) -> T?) throws -> T? {
         let string = try next()
         
         if string.isEmpty {
@@ -165,18 +166,20 @@ open class CSVDecoder {
         
         return t
     }
-    
-    fileprivate func next() throws -> String {
-        guard let s = enumerator.next() else {
-            throw NSError.csv.failedToDecode(strings)
-        }
-        return s.element
-    }
 
-    fileprivate func unwrapOptional<T>(_ t: T?) throws -> T {
+    open func unwrapOptional<T>(_ t: T?) throws -> T {
         guard let t = t else {
             throw NSError.csv.failedToDecode(strings)
         }
         return t
+    }
+    
+    // MARK:
+    
+    private func next() throws -> String {
+        guard let s = enumerator.next() else {
+            throw NSError.csv.failedToDecode(strings)
+        }
+        return s.element
     }
 }
