@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'UTF8CSV'
-  s.version      = '1.1.0'
+  s.version      = '1.2.0'
   s.summary      = 'Simple CSV parser for UTF8 encoding in Swift'
   s.description  = "Simple CSV parser for UTF8 encoding. Supports decoding strings into structures"
   s.homepage     = 'https://github.com/chaserCN/UTF8CSV'
