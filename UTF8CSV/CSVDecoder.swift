@@ -45,10 +45,20 @@ public protocol CSVIntRepresentable {
 }
 
 open class CSVDecoder {
-    fileprivate let strings: [String]
+    fileprivate var strings: [String]
     fileprivate var enumerator: EnumeratedIterator<IndexingIterator<Array<String>>>
     
     public init(strings: [String]) {
+        self.strings = strings
+        self.enumerator = self.strings.enumerated().makeIterator()
+    }
+
+    public init() {
+        self.strings = []
+        self.enumerator = self.strings.enumerated().makeIterator()
+    }
+    
+    public func reset(strings: [String]) {
         self.strings = strings
         self.enumerator = self.strings.enumerated().makeIterator()
     }
