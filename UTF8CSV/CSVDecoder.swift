@@ -58,7 +58,7 @@ open class CSVDecoder {
         self.enumerator = self.strings.enumerated().makeIterator()
     }
     
-    public func reset(strings: [String]) {
+    public func reset(with strings: [String]) {
         self.strings = strings
         self.enumerator = self.strings.enumerated().makeIterator()
     }
